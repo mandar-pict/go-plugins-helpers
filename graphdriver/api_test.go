@@ -217,12 +217,12 @@ func (p *testPlugin) Init(string, []string) error {
 	return nil
 }
 
-func (p *testPlugin) Create(string, string) error {
+func (p *testPlugin) Create(string, string, string) error {
 	p.create++
 	return nil
 }
 
-func (p *testPlugin) CreateReadWrite(string, string) error {
+func (p *testPlugin) CreateReadWrite(string, string, string) error {
 	p.createRW++
 	return nil
 }

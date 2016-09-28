@@ -219,8 +219,8 @@ type DiffSizeResponse struct {
 // Driver represent the interface a driver must fulfill.
 type Driver interface {
 	Init(home string, options []string) error
-	Create(id, parent string) error
-	CreateReadWrite(id, parent string) error
+	Create(id, parent, mntLabel string) error
+	CreateReadWrite(id, parent, mntLabel string) error
 	Remove(id string) error
 	Get(id, mountLabel string) (string, error)
 	Put(id string) error
@@ -267,7 +267,7 @@ func (h *Handler) initMux() {
 		if err != nil {
 			return
 		}
-		err = h.driver.Create(req.ID, req.Parent)
+		err = h.driver.Create(req.ID, req.Parent, req.MountLabel)
 		msg := ""
 		if err != nil {
 			msg = err.Error()
@@ -280,7 +280,7 @@ func (h *Handler) initMux() {
 		if err != nil {
 			return
 		}
-		err = h.driver.CreateReadWrite(req.ID, req.Parent)
+		err = h.driver.CreateReadWrite(req.ID, req.Parent, req.MountLabel)
 		msg := ""
 		if err != nil {
 			msg = err.Error()
@@ -384,8 +384,9 @@ func (h *Handler) initMux() {
 		sdk.EncodeResponse(w, &ChangesResponse{Err: msg, Changes: changes}, msg)
 	})
 	h.HandleFunc(applyDiffPath, func(w http.ResponseWriter, r *http.Request) {
-		id := r.Header.Get("id")
-		parent := r.Header.Get("parent")
+		Values := r.URL.Query()
+		id := Values.Get("id")
+		parent := Values.Get("parent")
 		size, err := h.driver.ApplyDiff(id, parent, r.Body)
 		msg := ""
 		if err != nil {
